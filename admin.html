@@ -1,0 +1,686 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>더베스트어학원 - 수강관리 시스템</title>
+    <style>
+        /* 기본 스타일 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        /* 헤더 */
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: cover;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* 로그인 상태 표시 */
+        .login-status {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px 30px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .user-details h3 {
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        
+        .user-details p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .demo-notice {
+            background: #fff3cd;
+            color: #856404;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+            font-size: 0.9rem;
+        }
+        
+        /* 메인 메뉴 */
+        .main-content {
+            padding: 40px 30px;
+        }
+        
+        .menu-section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #4CAF50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+        
+        .menu-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 30px 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .menu-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transform: translateY(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        
+        .menu-item:hover::before {
+            transform: translateY(0);
+        }
+        
+        .menu-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .menu-item h3 {
+            font-size: 1.3rem;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .menu-item p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        /* 대시보드 */
+        .dashboard-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            text-align: center;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        /* 푸터 */
+        .footer {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+            border-top: 1px solid #34495e;
+        }
+        
+        .footer-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .footer h3 {
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .quick-links {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .quick-links a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .quick-links a:hover {
+            color: white;
+            text-decoration: underline;
+        }
+        
+        .copyright {
+            color: #95a5a6;
+            font-size: 0.9rem;
+            margin-top: 20px;
+        }
+        
+        /* 반응형 디자인 */
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .login-status {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .menu-item {
+                padding: 25px 20px;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-links {
+                flex-direction: column;
+                gap: 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .main-content {
+                padding: 30px 20px;
+            }
+            
+            .menu-item {
+                padding: 20px 15px;
+            }
+            
+            .menu-icon {
+                font-size: 2.5rem;
+            }
+            
+            .menu-item h3 {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 헤더 -->
+        <div class="header">
+            <h1>더베스트어학원 수강관리 시스템</h1>
+            <p>쉽고 편리한 수강 관리를 경험해보세요</p>
+        </div>
+        
+        <!-- 로그인 상태 표시 -->
+        <div class="login-status">
+            <div class="user-info">
+                <div class="user-avatar">관</div>
+                <div class="user-details">
+                    <h3>수강 관리자</h3>
+                    <p>모든 기능이 바로 이용 가능합니다</p>
+                </div>
+            </div>
+            <div class="demo-notice">
+                <i class="fas fa-info-circle"></i> 로그인 없이 바로 이용 가능
+            </div>
+        </div>
+        
+        <!-- 메인 콘텐츠 -->
+        <div class="main-content">
+            <!-- 대시보드 -->
+            <div class="dashboard-section">
+                <h2 class="section-title"><i class="fas fa-tachometer-alt"></i> 대시보드</h2>
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">1,234</div>
+                        <div class="stat-label">총 수강생</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">89</div>
+                        <div class="stat-label">진행중인 강의</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">96%</div>
+                        <div class="stat-label">평균 출석율</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">45</div>
+                        <div class="stat-label">신규 신청</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 주요 기능 메뉴 -->
+            <div class="menu-section">
+                <h2 class="section-title"><i class="fas fa-th-large"></i> 주요 기능</h2>
+                <div class="menu-grid">
+                    <div class="menu-item" onclick="goTo('my-courses')">
+                        <div class="menu-icon">
+                            <i class="fas fa-book"></i>
+                        </div>
+                        <h3>내 수강목록</h3>
+                        <p>신청한 강의 확인 및 관리</p>
+                    </div>
+                    
+                    <div class="menu-item" onclick="goTo('course-registration')">
+                        <div class="menu-icon">
+                            <i class="fas fa-clipboard-list"></i>
+                        </div>
+                        <h3>수강신청</h3>
+                        <p>새로운 강의 신청 및 등록</p>
+                    </div>
+                    
+                    <div class="menu-item" onclick="goTo('attendance')">
+                        <div class="menu-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <h3>출석현황</h3>
+                        <p>출석 기록 확인 및 관리</p>
+                    </div>
+                    
+                    <div class="menu-item" onclick="goTo('profile')">
+                        <div class="menu-icon">
+                            <i class="fas fa-user-cog"></i>
+                        </div>
+                        <h3>내 정보 관리</h3>
+                        <p>개인정보 수정 및 관리</p>
+                    </div>
+                    
+                    <div class="menu-item" onclick="goTo('timetable')">
+                        <div class="menu-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <h3>시간표</h3>
+                        <p>수업 시간표 확인</p>
+                    </div>
+                    
+                    <div class="menu-item" onclick="goTo('grades')">
+                        <div class="menu-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>성적 확인</h3>
+                        <p>성적 조회 및 분석</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 관리 기능 메뉴 -->
+            <div class="menu-section">
+                <h2 class="section-title"><i class="fas fa-cogs"></i> 관리 기능</h2>
+                <div class="menu-grid">
+                    <div class="menu-item" onclick="goTo('student-management')">
+                        <div class="menu-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>학생 관리</h3>
+                        <p>수강생 정보 관리 및 조회</p>
+                    </div>
+                    
+                    <div class="menu-item" onclick="goTo('course-management')">
+                        <div class="menu-icon">
+                            <i class="fas fa-chalkboard-teacher"></i>
+                        </div>
+                        <h3>강의 관리</h3>
+                        <p>강의 정보 관리 및 설정</p>
+                    </div>
+                    
+                    <div class="menu-item" onclick="goTo('payment-management')">
+                        <div class="menu-icon">
+                            <i class="fas fa-credit-card"></i>
+                        </div>
+                        <h3>결제 관리</h3>
+                        <p>수강료 결제 관리 및 조회</p>
+                    </div>
+                    
+                    <div class="menu-item" onclick="goTo('report-management')">
+                        <div class="menu-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <h3>보고서</h3>
+                        <p>통계 및 보고서 생성</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 푸터 -->
+        <div class="footer">
+            <div class="footer-content">
+                <h3>더베스트어학원 수강관리 시스템</h3>
+                <p>인천 연수구 컨벤시아대로 230번길 42 아라프라자 2층 207-1</p>
+                <p>전화: 032-252-9600 | 이메일: gcha3514@naver.com</p>
+                
+                <div class="quick-links">
+                    <a href="https://thebestys.github.io/" target="_blank">홈페이지</a>
+                    <a href="https://cafe.naver.com/thebestedu" target="_blank">공지사항</a>
+                    <a href="https://m.blog.naver.com/jian112/223078136097" target="_blank">블로그</a>
+                    <a href="https://thebestys.github.io/login-eduhome/" target="_blank">로그인 페이지</a>
+                </div>
+                
+                <div class="copyright">
+                    &copy; 2024 더베스트어학원. 모든 권리 보유. | 수강관리 시스템 v2.0
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 로그인 없이 바로 접근 가능
+        
+        // 현재 사용자 정보 설정 (데모용)
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('✅ 수강관리 시스템 로드 완료');
+            console.log('✅ 로그인 없이 바로 접근 가능');
+            
+            // 사용자 이름 설정
+            const userName = '수강 관리자';
+            document.querySelector('.user-details h3').textContent = userName;
+            
+            // 현재 시간 표시
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 60000); // 1분마다 갱신
+        });
+        
+        // 현재 시간 업데이트 함수
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleString('ko-KR', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+                weekday: 'long',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            
+            const timeElement = document.querySelector('.user-details p');
+            if (timeElement) {
+                timeElement.textContent = timeString + ' | 모든 기능 이용 가능';
+            }
+        }
+        
+        // 페이지 이동 함수
+        function goTo(page) {
+            const pages = {
+                'my-courses': '내 수강목록',
+                'course-registration': '수강신청',
+                'attendance': '출석현황',
+                'profile': '내 정보',
+                'timetable': '시간표',
+                'grades': '성적 확인',
+                'student-management': '학생 관리',
+                'course-management': '강의 관리',
+                'payment-management': '결제 관리',
+                'report-management': '보고서'
+            };
+            
+            const pageName = pages[page] || page;
+            
+            // 데모용 알림
+            showNotification(`🚀 ${pageName} 페이지로 이동합니다.`, 'info');
+            
+            // 실제 구현 시 아래 코드 사용
+            // window.location.href = page + '.html';
+            
+            // 데모용: 일부 페이지는 시뮬레이션
+            if (page === 'my-courses') {
+                simulatePage('내 수강목록', `
+                    <div style="padding: 30px;">
+                        <h2>📚 내 수강목록</h2>
+                        <div style="margin-top: 20px;">
+                            <div style="background: white; border-radius: 10px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                <h3 style="color: #4CAF50;">실전 영어 회화 (초급)</h3>
+                                <p>강사: 김영어 선생님</p>
+                                <p>시간: 월/수 19:00-20:30</p>
+                                <p>상태: 진행중</p>
+                            </div>
+                            <div style="background: white; border-radius: 10px; padding: 20px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                <h3 style="color: #4CAF50;">토익 고득점 완성</h3>
+                                <p>강사: 이토익 선생님</p>
+                                <p>시간: 화/목 20:00-21:30</p>
+                                <p>상태: 진행중</p>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            } else if (page === 'attendance') {
+                simulatePage('출석현황', `
+                    <div style="padding: 30px;">
+                        <h2>✅ 출석현황</h2>
+                        <div style="margin-top: 20px;">
+                            <p>이번 달 출석률: <strong>95%</strong></p>
+                            <p>총 수업: 20회 | 출석: 19회 | 결석: 1회 | 지각: 0회</p>
+                            <div style="background: white; border-radius: 10px; padding: 20px; margin-top: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                                <h3>출석 현황 그래프</h3>
+                                <div style="height: 20px; background: #f0f0f0; border-radius: 10px; margin: 15px 0; overflow: hidden;">
+                                    <div style="height: 100%; width: 95%; background: linear-gradient(90deg, #4CAF50, #8BC34A);"></div>
+                                </div>
+                                <p style="text-align: center; color: #4CAF50;">출석률 95%</p>
+                            </div>
+                        </div>
+                    </div>
+                `);
+            }
+        }
+        
+        // 데모용 페이지 시뮬레이션
+        function simulatePage(title, content) {
+            const mainContent = document.querySelector('.main-content');
+            const originalContent = mainContent.innerHTML;
+            
+            mainContent.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <h2 style="font-size: 1.8rem;">${title}</h2>
+                    <button onclick="restoreMainContent()" style="background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                        <i class="fas fa-arrow-left"></i> 메인으로 돌아가기
+                    </button>
+                </div>
+                ${content}
+            `;
+            
+            // window 객체에 원본 콘텐츠 저장
+            window.originalMainContent = originalContent;
+        }
+        
+        // 메인 콘텐츠 복원
+        function restoreMainContent() {
+            const mainContent = document.querySelector('.main-content');
+            if (window.originalMainContent) {
+                mainContent.innerHTML = window.originalMainContent;
+                // 이벤트 리스너 다시 연결
+                attachEventListeners();
+            }
+        }
+        
+        // 이벤트 리스너 연결
+        function attachEventListeners() {
+            document.querySelectorAll('.menu-item').forEach(item => {
+                const page = item.getAttribute('onclick').match(/goTo\('([^']+)'\)/)[1];
+                item.onclick = () => goTo(page);
+            });
+        }
+        
+        // 알림 표시 함수
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background: ${type === 'error' ? '#f44336' : type === 'success' ? '#4CAF50' : '#2196F3'};
+                color: white;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+                font-family: inherit;
+            `;
+            
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'error' ? 'exclamation-triangle' : type === 'success' ? 'check-circle' : 'info-circle'}"></i>
+                ${message}
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // 3초 후 제거
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+            
+            // 애니메이션 추가
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // 초기 이벤트 리스너 연결
+        attachEventListeners();
+    </script>
+</body>
+</html>
